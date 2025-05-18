@@ -27,6 +27,7 @@
    IsUpcomingUptrend[t] = (EMA12[t+1] > EMA50[t+1])
    ```
 3. **Primitive Set**: Expose mathematics (`+, −, ×, ÷, max, min`), comparison ops, and indicator functions (RSI, ATR, Bollinger Bands, etc.).
+   The module `PrimitiveSetFactory.py` builds this set and allows easy extension with custom indicators.
 4. **GP Evolution**: 
 
    * PopulationSize individuals → evaluate on train set.
