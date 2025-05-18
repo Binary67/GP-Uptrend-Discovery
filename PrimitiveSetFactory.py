@@ -1,5 +1,6 @@
 import operator
 import pandas as pd
+import numpy as np
 from deap import gp
 
 
@@ -38,10 +39,14 @@ class PrimitiveSetFactory:
         if isinstance(X, pd.Series) or isinstance(Y, pd.Series):
             X = pd.Series(X) if not isinstance(X, pd.Series) else X
             Y = pd.Series(Y) if not isinstance(Y, pd.Series) else Y
-            Y = Y.replace(0, pd.NA)
+            X = X.astype(float)
+            Y = Y.astype(float)
+            Y = Y.replace(0, np.nan)
             Result = X / Y
-            Result = Result.fillna(0)
+            Result = Result.fillna(0).astype(float)
             return Result
+        X = float(X)
+        Y = float(Y)
         return X / Y if Y != 0 else 0
 
     @staticmethod
