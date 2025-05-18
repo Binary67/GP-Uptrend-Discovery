@@ -42,6 +42,13 @@ class DataProcessor:
         Data['EMA50'] = Data['Close'].ewm(span=50, adjust=False).mean()
         return Data
 
+    def CreateLabels(self, Data: DataFrame) -> DataFrame:
+        """Create the IsUpcomingUptrend column using a look-ahead."""
+        Data['IsUpcomingUptrend'] = Data['EMA12'].shift(-1) > Data['EMA50'].shift(-1)
+        Data = Data.iloc[:-1].copy()
+        Data['IsUpcomingUptrend'] = Data['IsUpcomingUptrend'].astype(bool)
+        return Data
+
     def GetProcessedData(self):
         if self.FilePath:
             Data = self.LoadDataFromFile(self.FilePath)
@@ -50,5 +57,6 @@ class DataProcessor:
             Data = Downloader.DownloadData()
         Data = self.ForwardFillMissingCandles(Data)
         Data = self.AddEmaColumns(Data)
+        Data = self.CreateLabels(Data)
         Data.columns.name = None
         return Data
