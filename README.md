@@ -1,6 +1,6 @@
 # GP-Uptrend-Discovery
 
-*Genetic Programming proof-of-concept that automatically rediscovers the classic “EMA 12 > EMA 50” up-trend rule, using Python’s `gplearn`.*
+*Genetic Programming proof-of-concept that automatically rediscovers the classic “EMA 12 > EMA 50” up-trend rule, using Python’s `deap`.*
 
 ---
 
