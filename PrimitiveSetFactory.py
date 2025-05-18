@@ -8,7 +8,7 @@ class PrimitiveSetFactory:
         self.Indicators = {}
         self.DefaultArithmeticOperators = [
             (operator.add, 2),
-            (operator.sub, 2),
+            (self.SafeSubtract, 2),
             (operator.mul, 2),
             (self.SafeDivide, 2),
         ]
@@ -26,7 +26,22 @@ class PrimitiveSetFactory:
         self.AddIndicator("BollingerLower", self.BollingerLower, 1)
 
     @staticmethod
+    def SafeSubtract(X, Y):
+        if isinstance(X, pd.Series):
+            X = X.astype(float)
+        if isinstance(Y, pd.Series):
+            Y = Y.astype(float)
+        return X - Y
+
+    @staticmethod
     def SafeDivide(X, Y):
+        if isinstance(X, pd.Series) or isinstance(Y, pd.Series):
+            X = pd.Series(X) if not isinstance(X, pd.Series) else X
+            Y = pd.Series(Y) if not isinstance(Y, pd.Series) else Y
+            Y = Y.replace(0, pd.NA)
+            Result = X / Y
+            Result = Result.fillna(0)
+            return Result
         return X / Y if Y != 0 else 0
 
     @staticmethod
@@ -42,9 +57,9 @@ class PrimitiveSetFactory:
 
     @staticmethod
     def ATR(High, Low, Close, Period=14):
-        Hl = High - Low
-        Hc = (High - Close.shift()).abs()
-        Lc = (Low - Close.shift()).abs()
+        Hl = PrimitiveSetFactory.SafeSubtract(High, Low)
+        Hc = PrimitiveSetFactory.SafeSubtract(High, Close.shift()).abs()
+        Lc = PrimitiveSetFactory.SafeSubtract(Low, Close.shift()).abs()
         Tr = pd.concat([Hl, Hc, Lc], axis=1).max(axis=1)
         ReturnValue = Tr.rolling(window=Period).mean()
         return ReturnValue
