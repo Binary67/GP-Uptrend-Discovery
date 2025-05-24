@@ -50,7 +50,7 @@ if __name__ == "__main__":
     PSet = DesignIndividualRepresentation()
     
     # Generate initial population
-    PopulationSize = 3000
+    PopulationSize = 500
     Population, Toolbox = GeneratePopulation(PSet, PopulationSize=PopulationSize)
     
     # Register fitness evaluation with training data
@@ -64,9 +64,9 @@ if __name__ == "__main__":
     Stats.register("max", np.max)
     
     # Evolution parameters
-    NGEN = 200  # Number of generations
+    NGEN = 50  # Number of generations
     CXPB = 0.7  # Crossover probability
-    MUTPB = 0.2  # Mutation probability
+    MUTPB = 0.3  # Mutation probability
     
     print(f"\n6. Starting evolution:")
     print(f"   Population Size: {PopulationSize}")
