@@ -8,7 +8,7 @@ import math
 def DesignIndividualRepresentation():
     """Design the individual representation (tree structure) for trading signals"""
     
-    PSet = gp.PrimitiveSet("MAIN", 10)
+    PSet = gp.PrimitiveSet("MAIN", 5)
     
     PSet.addPrimitive(operator.add, 2)
     PSet.addPrimitive(operator.sub, 2)
@@ -30,11 +30,6 @@ def DesignIndividualRepresentation():
     PSet.renameArguments(ARG2='Low')
     PSet.renameArguments(ARG3='Close')
     PSet.renameArguments(ARG4='Volume')
-    PSet.renameArguments(ARG5='RSI')
-    PSet.renameArguments(ARG6='MACD')
-    PSet.renameArguments(ARG7='BB_Upper')
-    PSet.renameArguments(ARG8='BB_Lower')
-    PSet.renameArguments(ARG9='ATR')
     
     if not hasattr(creator, "FitnessMax"):
         creator.create("FitnessMax", base.Fitness, weights=(1.0,))
