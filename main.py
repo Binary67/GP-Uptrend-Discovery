@@ -1,7 +1,8 @@
 from DataCleaning import DataCleaner
 from DataDownloader import YFinanceDownloader
 from DataLabel import DataLabel
-from GPFramework import DesignIndividualRepresentation, GeneratePopulation, RegisterFitnessEvaluation, EvaluateFitness
+from GPFramework import DesignIndividualRepresentation, GeneratePopulation, RegisterGeneticOperators, RegisterFitnessEvaluation
+from GP_Framework.FitnessEvaluator import EvaluateFitness
 from deap import algorithms, tools, gp
 import pandas as pd
 import numpy as np
@@ -50,8 +51,11 @@ if __name__ == "__main__":
     PSet = DesignIndividualRepresentation()
     
     # Generate initial population
-    PopulationSize = 500
+    PopulationSize = 3000
     Population, Toolbox = GeneratePopulation(PSet, PopulationSize=PopulationSize)
+    
+    # Register genetic operators
+    RegisterGeneticOperators(Toolbox, PSet)
     
     # Register fitness evaluation with training data
     RegisterFitnessEvaluation(Toolbox, TrainData, PSet)
@@ -64,7 +68,7 @@ if __name__ == "__main__":
     Stats.register("max", np.max)
     
     # Evolution parameters
-    NGEN = 50  # Number of generations
+    NGEN = 200  # Number of generations
     CXPB = 0.7  # Crossover probability
     MUTPB = 0.3  # Mutation probability
     

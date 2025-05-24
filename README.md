@@ -36,3 +36,71 @@ Day 10: EMA 12 crosses above EMA 50 → We're already positioned
 - EMA = Exponential Moving Average
 - This is a common technical indicator traders use
 - We want to predict this crossover 3-10 days before it happens
+
+## 🚀 Strongly Typed GP Implementation Tasks
+
+### Phase 1: Type System Design
+- [ ] Define core type hierarchy (float, series, bool, int)
+- [ ] Design type promotion rules (e.g., float + series = series)
+- [ ] Create type checking utilities and validators
+- [ ] Document type system specifications
+
+### Phase 2: Primitive Set Refactoring
+- [ ] Modify PrimitiveSetBuilder to use DEAP's PrimitiveSetTyped
+- [ ] Add type registration system for primitives
+- [ ] Update primitive registration to include input/output types
+- [ ] Create typed terminal generation (typed constants, variables)
+
+### Phase 3: Primitive Type Annotations
+#### GP_Primitives/
+- [ ] Add type signatures to MathPrimitives (Add, Sub, Mul, Div, etc.)
+- [ ] Create separate typed versions for scalar vs series operations
+- [ ] Update ComparisonPrimitives with bool return types
+- [ ] Type TradingPrimitives (Buy, Sell signals)
+
+#### GP_Indicators/
+- [ ] Type BasicIndicators (EMA, SMA, etc.) - series input/output
+- [ ] Type MomentumIndicators (RSI, MACD, etc.)
+- [ ] Type MultiTimeframe operations
+- [ ] Type PositionEncoding functions
+
+### Phase 4: Genetic Operators Update
+- [ ] Implement type-aware crossover (only swap compatible subtrees)
+- [ ] Create typed mutation operators respecting type constraints
+- [ ] Update bloat control for typed trees
+- [ ] Add type-safe subtree selection methods
+
+### Phase 5: Population Management
+- [ ] Modify tree generation to use typed primitive set
+- [ ] Implement type-aware genHalfAndHalf/genFull/genGrow
+- [ ] Update individual creation with type constraints
+- [ ] Ensure initial population type correctness
+
+### Phase 6: Fitness Evaluation
+- [ ] Remove runtime type checking in EvaluateIndividual
+- [ ] Update compilation to leverage type guarantees
+- [ ] Simplify error handling (type errors impossible)
+- [ ] Optimize evaluation with type information
+
+### Phase 7: Testing & Validation
+- [ ] Create unit tests for typed primitives
+- [ ] Test type-aware genetic operators
+- [ ] Validate type system with edge cases
+- [ ] Performance comparison (typed vs untyped)
+
+### Phase 8: Documentation & Migration
+- [ ] Document new type system usage
+- [ ] Create migration guide from untyped to typed
+- [ ] Update examples with typed GP
+- [ ] Add type system design rationale
+
+### Estimated Effort
+- **Total Tasks**: ~35 major items
+- **Complexity**: High - requires careful design to maintain expressiveness
+- **Benefits**: 
+  - Eliminate runtime type errors
+  - Faster evolution (invalid trees never generated)
+  - Clearer primitive semantics
+  - Better code maintainability
+
+
