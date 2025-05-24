@@ -27,7 +27,6 @@ if __name__ == "__main__":
     
     PopulationSize = 100
     Population, Toolbox = GeneratePopulation(PSet, PopulationSize=PopulationSize)
-    print(f"\nGenerated population of {len(Population)} individuals")
 
     for EachPopulation in Population[:10]:
         print(EachPopulation)
