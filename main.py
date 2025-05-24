@@ -16,7 +16,7 @@ if __name__ == "__main__":
     
     # Download and prepare data
     print("1. Downloading market data...")
-    DataDownloaderObj = YFinanceDownloader('AAPL', '2020-01-01', '2024-12-31', '1d')
+    DataDownloaderObj = YFinanceDownloader('AAPL', '2023-06-01', '2025-05-15', '1h')
     TradingData = DataDownloaderObj.DownloadData()
     print(f"   Downloaded {len(TradingData)} days of data")
 
@@ -50,7 +50,7 @@ if __name__ == "__main__":
     PSet = DesignIndividualRepresentation()
     
     # Generate initial population
-    PopulationSize = 500
+    PopulationSize = 3000
     Population, Toolbox = GeneratePopulation(PSet, PopulationSize=PopulationSize)
     
     # Register fitness evaluation with training data
@@ -64,7 +64,7 @@ if __name__ == "__main__":
     Stats.register("max", np.max)
     
     # Evolution parameters
-    NGEN = 25  # Number of generations
+    NGEN = 200  # Number of generations
     CXPB = 0.7  # Crossover probability
     MUTPB = 0.2  # Mutation probability
     
@@ -126,6 +126,7 @@ if __name__ == "__main__":
     
     # Calculate final metrics
     ActualLabels = TestData['Label'].iloc[200:].values
+    print(TestData.iloc[200:]['Label'].value_counts())
     Predictions = np.array(Predictions[:len(ActualLabels)])
     
     TruePositives = np.sum((Predictions == 1) & (ActualLabels == 1))
