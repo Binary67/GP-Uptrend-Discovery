@@ -64,7 +64,7 @@ if __name__ == "__main__":
     Stats.register("max", np.max)
     
     # Evolution parameters
-    NGEN = 50  # Number of generations
+    NGEN = 25  # Number of generations
     CXPB = 0.7  # Crossover probability
     MUTPB = 0.2  # Mutation probability
     

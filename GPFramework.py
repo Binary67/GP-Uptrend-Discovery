@@ -4,6 +4,7 @@ from deap import base, creator, tools, gp
 import operator
 import math
 import pandas_ta as ta
+import pandas as pd
 
 
 def DesignIndividualRepresentation():
@@ -32,6 +33,27 @@ def DesignIndividualRepresentation():
     PSet.addPrimitive(BollingerBands, 3)  # BB(data, period, std)
     PSet.addPrimitive(ATR, 3)  # ATR(high, low, close)
     PSet.addPrimitive(Momentum, 2)  # Momentum(data, period)
+    
+    # Comparison Operators
+    PSet.addPrimitive(GreaterThan, 2)
+    PSet.addPrimitive(LessThan, 2)
+    PSet.addPrimitive(GreaterEqual, 2)
+    PSet.addPrimitive(LessEqual, 2)
+    PSet.addPrimitive(Equal, 2)
+    
+    # Logical Operators
+    PSet.addPrimitive(And, 2)
+    PSet.addPrimitive(Or, 2)
+    PSet.addPrimitive(Not, 1)
+    
+    # Conditional Operator
+    PSet.addPrimitive(IfThenElse, 3)
+    
+    # Trading-Specific Operators
+    PSet.addPrimitive(Lag, 2)  # Lag(data, periods)
+    PSet.addPrimitive(Change, 2)  # Change(data, periods)
+    PSet.addPrimitive(CrossOver, 2)  # CrossOver(series1, series2)
+    PSet.addPrimitive(CrossUnder, 2)  # CrossUnder(series1, series2)
     
     PSet.addEphemeralConstant("Rand101", lambda: random.uniform(-1, 1))
     PSet.addEphemeralConstant("RandPeriod", lambda: random.randint(5, 50))
@@ -197,6 +219,167 @@ def Momentum(Data, Period):
     if isinstance(Data, (int, float)):
         return 0
     return ta.roc(Data, length=Period)
+
+
+# Comparison Operators
+def GreaterThan(Left, Right):
+    """Return 1 if Left > Right, else -1"""
+    try:
+        # Handle series comparisons
+        if hasattr(Left, '__len__') and hasattr(Right, '__len__'):
+            return (Left > Right).astype(float) * 2 - 1
+        return 1 if Left > Right else -1
+    except:
+        return -1
+
+
+def LessThan(Left, Right):
+    """Return 1 if Left < Right, else -1"""
+    try:
+        if hasattr(Left, '__len__') and hasattr(Right, '__len__'):
+            return (Left < Right).astype(float) * 2 - 1
+        return 1 if Left < Right else -1
+    except:
+        return -1
+
+
+def GreaterEqual(Left, Right):
+    """Return 1 if Left >= Right, else -1"""
+    try:
+        if hasattr(Left, '__len__') and hasattr(Right, '__len__'):
+            return (Left >= Right).astype(float) * 2 - 1
+        return 1 if Left >= Right else -1
+    except:
+        return -1
+
+
+def LessEqual(Left, Right):
+    """Return 1 if Left <= Right, else -1"""
+    try:
+        if hasattr(Left, '__len__') and hasattr(Right, '__len__'):
+            return (Left <= Right).astype(float) * 2 - 1
+        return 1 if Left <= Right else -1
+    except:
+        return -1
+
+
+def Equal(Left, Right):
+    """Return 1 if Left == Right (with tolerance), else -1"""
+    try:
+        Tolerance = 0.0001
+        if hasattr(Left, '__len__') and hasattr(Right, '__len__'):
+            return (abs(Left - Right) < Tolerance).astype(float) * 2 - 1
+        return 1 if abs(Left - Right) < Tolerance else -1
+    except:
+        return -1
+
+
+# Logical Operators
+def And(Left, Right):
+    """Logical AND - both must be positive"""
+    try:
+        if hasattr(Left, '__len__') and hasattr(Right, '__len__'):
+            return ((Left > 0) & (Right > 0)).astype(float) * 2 - 1
+        return 1 if Left > 0 and Right > 0 else -1
+    except:
+        return -1
+
+
+def Or(Left, Right):
+    """Logical OR - at least one must be positive"""
+    try:
+        if hasattr(Left, '__len__') and hasattr(Right, '__len__'):
+            return ((Left > 0) | (Right > 0)).astype(float) * 2 - 1
+        return 1 if Left > 0 or Right > 0 else -1
+    except:
+        return -1
+
+
+def Not(Value):
+    """Logical NOT - negate the sign"""
+    try:
+        if hasattr(Value, '__len__'):
+            return -Value
+        return -Value
+    except:
+        return 1
+
+
+# Conditional Operator
+def IfThenElse(Condition, TrueValue, FalseValue):
+    """If Condition > 0 return TrueValue, else FalseValue"""
+    try:
+        if hasattr(Condition, '__len__'):
+            # Handle series data
+            import pandas as pd
+            import numpy as np
+            Result = pd.Series(index=Condition.index if hasattr(Condition, 'index') else range(len(Condition)))
+            Mask = Condition > 0
+            Result[Mask] = TrueValue[Mask] if hasattr(TrueValue, '__len__') else TrueValue
+            Result[~Mask] = FalseValue[~Mask] if hasattr(FalseValue, '__len__') else FalseValue
+            return Result
+        return TrueValue if Condition > 0 else FalseValue
+    except:
+        return FalseValue
+
+
+# Trading-Specific Operators
+def Lag(Data, Periods):
+    """Get lagged values of data"""
+    try:
+        Periods = int(abs(Periods)) + 1
+        Periods = min(max(Periods, 1), 50)
+        if hasattr(Data, 'shift'):
+            return Data.shift(Periods)
+        elif hasattr(Data, '__len__'):
+            import pandas as pd
+            return pd.Series(Data).shift(Periods)
+        return Data
+    except:
+        return Data
+
+
+def Change(Data, Periods):
+    """Calculate change over periods"""
+    try:
+        Periods = int(abs(Periods)) + 1
+        Periods = min(max(Periods, 1), 50)
+        if hasattr(Data, 'diff'):
+            return Data.diff(Periods)
+        elif hasattr(Data, '__len__'):
+            import pandas as pd
+            return pd.Series(Data).diff(Periods)
+        return 0
+    except:
+        return 0
+
+
+def CrossOver(Series1, Series2):
+    """Detect when Series1 crosses above Series2"""
+    try:
+        if hasattr(Series1, '__len__') and hasattr(Series2, '__len__'):
+            import pandas as pd
+            S1 = pd.Series(Series1) if not hasattr(Series1, 'shift') else Series1
+            S2 = pd.Series(Series2) if not hasattr(Series2, 'shift') else Series2
+            Cross = (S1.shift(1) <= S2.shift(1)) & (S1 > S2)
+            return Cross.astype(float) * 2 - 1
+        return -1
+    except:
+        return -1
+
+
+def CrossUnder(Series1, Series2):
+    """Detect when Series1 crosses below Series2"""
+    try:
+        if hasattr(Series1, '__len__') and hasattr(Series2, '__len__'):
+            import pandas as pd
+            S1 = pd.Series(Series1) if not hasattr(Series1, 'shift') else Series1
+            S2 = pd.Series(Series2) if not hasattr(Series2, 'shift') else Series2
+            Cross = (S1.shift(1) >= S2.shift(1)) & (S1 < S2)
+            return Cross.astype(float) * 2 - 1
+        return -1
+    except:
+        return -1
 
 
 def EvaluateFitness(Individual, Data, PSet):
