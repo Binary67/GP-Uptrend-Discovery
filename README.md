@@ -37,70 +37,45 @@ Day 10: EMA 12 crosses above EMA 50 → We're already positioned
 - This is a common technical indicator traders use
 - We want to predict this crossover 3-10 days before it happens
 
-## 🚀 Strongly Typed GP Implementation Tasks
+## 📁 Project Structure
 
-### Phase 1: Type System Design
-- [ ] Define core type hierarchy (float, series, bool, int)
-- [ ] Design type promotion rules (e.g., float + series = series)
-- [ ] Create type checking utilities and validators
-- [ ] Document type system specifications
+### Core Files
 
-### Phase 2: Primitive Set Refactoring
-- [ ] Modify PrimitiveSetBuilder to use DEAP's PrimitiveSetTyped
-- [ ] Add type registration system for primitives
-- [ ] Update primitive registration to include input/output types
-- [ ] Create typed terminal generation (typed constants, variables)
+- **`main.py`**: Entry point that orchestrates the entire GP workflow - downloads data, cleans it, labels it, runs evolution for 200 generations with population of 3000
 
-### Phase 3: Primitive Type Annotations
-#### GP_Primitives/
-- [ ] Add type signatures to MathPrimitives (Add, Sub, Mul, Div, etc.)
-- [ ] Create separate typed versions for scalar vs series operations
-- [ ] Update ComparisonPrimitives with bool return types
-- [ ] Type TradingPrimitives (Buy, Sell signals)
+- **`DataDownloader.py`**: Downloads market data from Yahoo Finance with support for chunked hourly data retrieval to work around API limitations
 
-#### GP_Indicators/
-- [ ] Type BasicIndicators (EMA, SMA, etc.) - series input/output
-- [ ] Type MomentumIndicators (RSI, MACD, etc.)
-- [ ] Type MultiTimeframe operations
-- [ ] Type PositionEncoding functions
+- **`DataCleaning.py`**: Cleans and validates market data by checking OHLC relationships, removing outliers, and handling missing values
 
-### Phase 4: Genetic Operators Update
-- [ ] Implement type-aware crossover (only swap compatible subtrees)
-- [ ] Create typed mutation operators respecting type constraints
-- [ ] Update bloat control for typed trees
-- [ ] Add type-safe subtree selection methods
+- **`DataLabel.py`**: Labels data with prediction targets by identifying EMA crossovers and marking signals 3-10 days before they occur
 
-### Phase 5: Population Management
-- [ ] Modify tree generation to use typed primitive set
-- [ ] Implement type-aware genHalfAndHalf/genFull/genGrow
-- [ ] Update individual creation with type constraints
-- [ ] Ensure initial population type correctness
+- **`GPFramework.py`**: High-level orchestrator that provides a clean API to initialize and configure the entire GP framework
 
-### Phase 6: Fitness Evaluation
-- [ ] Remove runtime type checking in EvaluateIndividual
-- [ ] Update compilation to leverage type guarantees
-- [ ] Simplify error handling (type errors impossible)
-- [ ] Optimize evaluation with type information
+### GP Framework Components (`GP_Framework/`)
 
-### Phase 7: Testing & Validation
-- [ ] Create unit tests for typed primitives
-- [ ] Test type-aware genetic operators
-- [ ] Validate type system with edge cases
-- [ ] Performance comparison (typed vs untyped)
+- **`FitnessEvaluator.py`**: Evaluates GP individuals using F1 score with early detection bonus - rewards accurate predictions that come days before the actual crossover
 
-### Phase 8: Documentation & Migration
-- [ ] Document new type system usage
-- [ ] Create migration guide from untyped to typed
-- [ ] Update examples with typed GP
-- [ ] Add type system design rationale
+- **`GeneticOperators.py`**: Defines genetic operators (crossover, mutation, selection) that create new individuals during evolution
 
-### Estimated Effort
-- **Total Tasks**: ~35 major items
-- **Complexity**: High - requires careful design to maintain expressiveness
-- **Benefits**: 
-  - Eliminate runtime type errors
-  - Faster evolution (invalid trees never generated)
-  - Clearer primitive semantics
-  - Better code maintainability
+- **`PopulationManager.py`**: Manages GP population creation and initialization using DEAP framework
 
+- **`PrimitiveSetBuilder.py`**: Builds the primitive set defining all available functions and terminals for constructing trading signals
+
+### Technical Indicators (`GP_Indicators/`)
+
+- **`BasicIndicators.py`**: Standard technical indicators (EMA, RSI, MACD, Bollinger Bands, ATR, Momentum) wrapped for GP use
+
+- **`MomentumIndicators.py`**: Calculates momentum across multiple timeframes (hourly, daily, weekly) and their alignment
+
+- **`MultiTimeframe.py`**: Calculates indicators on different timeframes to enable multi-timeframe analysis
+
+- **`PositionEncoding.py`**: Encodes price position relative to timeframe ranges and moving averages for context
+
+### GP Primitives (`GP_Primitives/`)
+
+- **`ComparisonPrimitives.py`**: Comparison and logical operators (>, <, AND, OR, IF-THEN-ELSE) for conditional logic
+
+- **`MathPrimitives.py`**: Basic mathematical operations (protected division, min/max, sqrt, log, trig functions)
+
+- **`TradingPrimitives.py`**: Trading-specific operations like crossovers, lags, and price changes for pattern detection
 
